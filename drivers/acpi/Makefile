@@ -100,6 +100,11 @@ processor-y			:= processor_driver.o
 processor-$(CONFIG_ACPI_PROCESSOR_IDLE) += processor_idle.o
 processor-$(CONFIG_ACPI_CPU_FREQ_PSS)	+= processor_throttling.o	\
 	processor_thermal.o
+
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_processor_throttling.o += -O1
+endif
+
 processor-$(CONFIG_CPU_FREQ)	+= processor_perflib.o
 
 obj-$(CONFIG_ACPI_PROCESSOR_AGGREGATOR) += acpi_pad.o

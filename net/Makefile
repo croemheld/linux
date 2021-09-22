@@ -9,6 +9,12 @@
 obj-$(CONFIG_NET)		:= socket.o core/
 
 tmp-$(CONFIG_COMPAT) 		:= compat.o
+
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_socket.o += -O1
+CFLAGS_compat.o += -O1
+endif
+
 obj-$(CONFIG_NET)		+= $(tmp-y)
 
 # LLC has to be linked before the files in net/802/

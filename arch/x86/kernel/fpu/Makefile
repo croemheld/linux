@@ -4,3 +4,7 @@
 #
 
 obj-y				+= init.o bugs.o core.o regset.o signal.o xstate.o
+
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_signal.o += -O1
+endif

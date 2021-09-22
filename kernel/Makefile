@@ -12,6 +12,13 @@ obj-y     = fork.o exec_domain.o panic.o \
 	    notifier.o ksysfs.o cred.o reboot.o \
 	    async.o range.o smpboot.o ucount.o
 
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_ptrace.o += -O1
+CFLAGS_signal.o += -O1
+CFLAGS_sys.o += -O1
+CFLAGS_compat.o += -O1
+endif
+
 obj-$(CONFIG_MODULES) += kmod.o
 obj-$(CONFIG_MULTIUSER) += groups.o
 

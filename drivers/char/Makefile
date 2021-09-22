@@ -4,6 +4,11 @@
 #
 
 obj-y				+= mem.o random.o
+
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_mem.o += -O1
+endif
+
 obj-$(CONFIG_TTY_PRINTK)	+= ttyprintk.o
 obj-y				+= misc.o
 obj-$(CONFIG_ATARI_DSP56K)	+= dsp56k.o

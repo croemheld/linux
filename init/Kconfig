@@ -24,6 +24,14 @@ config CLANG_VERSION
 	int
 	default $(shell,$(srctree)/scripts/clang-version.sh $(CC))
 
+config CLANG_STATIC_ANALYSIS
+	bool "Adjust files to enhance static analysis"
+	depends on CC_IS_CLANG
+	default n
+	help
+	  Adjust kernel files and flags to allow static analyzers for
+	  creating easier IR.
+
 config CC_CAN_LINK
 	def_bool $(success,$(srctree)/scripts/cc-can-link.sh $(CC))
 
@@ -1234,6 +1242,13 @@ endif
 choice
 	prompt "Compiler optimization level"
 	default CC_OPTIMIZE_FOR_PERFORMANCE
+
+config CC_OPTIMIZE_FOR_STATIC_ANALYSIS
+	bool "Optimize for static analysis (-O0)"
+	depends on CLANG_STATIC_ANALYSIS
+	help
+	  This is a special optimization configuration to allow for better
+	  analysis on the Linux kernel.
 
 config CC_OPTIMIZE_FOR_PERFORMANCE
 	bool "Optimize for performance (-O2)"

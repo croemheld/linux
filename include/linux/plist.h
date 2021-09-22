@@ -75,6 +75,7 @@
 
 #include <linux/kernel.h>
 #include <linux/list.h>
+#include <linux/string.h>
 
 struct plist_head {
 	struct list_head node_list;

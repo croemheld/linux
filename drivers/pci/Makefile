@@ -13,6 +13,10 @@ obj-$(CONFIG_SYSFS)		+= slot.o
 obj-$(CONFIG_ACPI)		+= pci-acpi.o
 endif
 
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_proc.o += -O1
+endif
+
 obj-$(CONFIG_OF)		+= of.o
 obj-$(CONFIG_PCI_QUIRKS)	+= quirks.o
 obj-$(CONFIG_PCIEPORTBUS)	+= pcie/

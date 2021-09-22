@@ -61,3 +61,7 @@ else
         lib-y += copy_user_64.o
 	lib-y += cmpxchg16b_emu.o
 endif
+
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_csum-wrappers_64.o += -O1
+endif

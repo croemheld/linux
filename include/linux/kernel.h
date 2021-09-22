@@ -989,12 +989,21 @@ static inline void ftrace_dump(enum ftrace_dump_mode oops_dump_mode) { }
  * @member:	the name of the member within the struct.
  *
  */
+#ifdef CONFIG_CLANG_STATIC_ANALYSIS
+#define container_of(ptr, type, member) ({				\
+	type *__res;							\
+	void *__mptr = ((void *)((void *)(ptr) -			\
+		offsetof(type, member)));				\
+	memcpy(&__res, &__mptr, sizeof(void *));			\
+	(__res); })
+#else
 #define container_of(ptr, type, member) ({				\
 	void *__mptr = (void *)(ptr);					\
 	BUILD_BUG_ON_MSG(!__same_type(*(ptr), ((type *)0)->member) &&	\
 			 !__same_type(*(ptr), void),			\
 			 "pointer type mismatch in container_of()");	\
 	((type *)(__mptr - offsetof(type, member))); })
+#endif
 
 /**
  * container_of_safe - cast a member of a structure out to the containing structure

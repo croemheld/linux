@@ -10,6 +10,10 @@ KCOV_INSTRUMENT		:= n
 obj-$(CONFIG_X86_LOCAL_APIC)	+= apic.o apic_common.o apic_noop.o ipi.o vector.o
 obj-y				+= hw_nmi.o
 
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_apic.o += -O1
+endif
+
 obj-$(CONFIG_X86_IO_APIC)	+= io_apic.o
 obj-$(CONFIG_PCI_MSI)		+= msi.o
 obj-$(CONFIG_SMP)		+= ipi.o

@@ -65,6 +65,13 @@ obj-y			+= resource.o
 obj-y			+= irqflags.o
 
 obj-y				+= process.o
+
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_process.o += -O1
+CFLAGS_ptrace.o += -O1
+CFLAGS_smpboot.o += -O1
+endif
+
 obj-y				+= fpu/
 obj-y				+= ptrace.o
 obj-$(CONFIG_X86_32)		+= tls.o

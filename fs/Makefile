@@ -15,6 +15,13 @@ obj-y :=	open.o read_write.o file_table.o super.o \
 		stack.o fs_struct.o statfs.o fs_pin.o nsfs.o \
 		fs_types.o fs_context.o fs_parser.o fsopen.o
 
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_readdir.o += -O1
+CFLAGS_select.o += -O1
+CFLAGS_eventpoll.o += -O1
+CFLAGS_compat_binfmt_elf.o += -O1
+endif
+
 ifeq ($(CONFIG_BLOCK),y)
 obj-y +=	buffer.o block_dev.o direct-io.o mpage.o
 else

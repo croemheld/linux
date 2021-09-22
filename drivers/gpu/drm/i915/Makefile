@@ -67,6 +67,11 @@ i915-y += \
 	i915_user_extensions.o
 
 i915-$(CONFIG_COMPAT)   += i915_ioc32.o
+
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_i915_ioc32.o += -O1
+endif
+
 i915-$(CONFIG_DEBUG_FS) += i915_debugfs.o display/intel_pipe_crc.o
 i915-$(CONFIG_PERF_EVENTS) += i915_pmu.o
 

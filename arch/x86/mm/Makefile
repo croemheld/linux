@@ -15,6 +15,13 @@ endif
 obj-y	:=  init.o init_$(BITS).o fault.o ioremap.o extable.o pageattr.o mmap.o \
 	    pat.o pgtable.o physaddr.o setup_nx.o tlb.o cpu_entry_area.o
 
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_init_$(BITS).o += -O1
+CFLAGS_ioremap.o += -O1
+CFLAGS_pageattr.o += -O1
+CFLAGS_tlb.o += -O1
+endif
+
 # Make sure __phys_addr has no stackprotector
 nostackp := $(call cc-option, -fno-stack-protector)
 CFLAGS_physaddr.o		:= $(nostackp)
