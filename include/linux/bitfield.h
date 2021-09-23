@@ -9,6 +9,7 @@
 
 #include <linux/build_bug.h>
 #include <asm/byteorder.h>
+#include <asm/bug.h>
 
 /*
  * Bitfield access macros
@@ -98,8 +99,13 @@
 
 extern void __compiletime_error("value doesn't fit into mask")
 __field_overflow(void);
+
+#ifdef CONFIG_CLANG_STATIC_ANALYSIS
+#define __bad_mask()		BUG()
+#else
 extern void __compiletime_error("bad bitfield mask")
 __bad_mask(void);
+#endif
 static __always_inline u64 field_multiplier(u64 field)
 {
 	if ((field | (field - 1)) & ((field | (field - 1)) + 1))

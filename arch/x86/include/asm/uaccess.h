@@ -8,6 +8,7 @@
 #include <linux/kasan-checks.h>
 #include <linux/string.h>
 #include <asm/asm.h>
+#include <asm/bug.h>
 #include <asm/page.h>
 #include <asm/smap.h>
 #include <asm/extable.h>
@@ -115,7 +116,16 @@ extern int __get_user_1(void);
 extern int __get_user_2(void);
 extern int __get_user_4(void);
 extern int __get_user_8(void);
+
+#ifdef CONFIG_CLANG_STATIC_ANALYSIS
+#define __get_user_bad()		\
+({					\
+	BUG();				\
+	0;				\
+})
+#else
 extern int __get_user_bad(void);
+#endif
 
 #define __uaccess_begin() stac()
 #define __uaccess_end()   clac()
@@ -213,7 +223,14 @@ __typeof__(__builtin_choose_expr(sizeof(x) > sizeof(0UL), 0ULL, 0UL))
 #define __put_user_x8(x, ptr, __ret_pu) __put_user_x(8, x, ptr, __ret_pu)
 #endif
 
+#ifdef CONFIG_CLANG_STATIC_ANALYSIS
+#define __put_user_bad()		\
+({					\
+	BUG();				\
+})
+#else
 extern void __put_user_bad(void);
+#endif
 
 /*
  * Strange magic calling convention: pointer in %ecx,
