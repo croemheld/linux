@@ -1054,6 +1054,7 @@ static int clear_refs_pte_range(pmd_t *pmd, unsigned long addr,
 	spinlock_t *ptl;
 	struct page *page;
 
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
 	ptl = pmd_trans_huge_lock(pmd, vma);
 	if (ptl) {
 		if (cp->type == CLEAR_REFS_SOFT_DIRTY) {
@@ -1074,6 +1075,7 @@ out:
 		spin_unlock(ptl);
 		return 0;
 	}
+#endif
 
 	if (pmd_trans_unstable(pmd))
 		return 0;
