@@ -567,9 +567,11 @@ static inline struct kmem_cache *slab_pre_alloc_hook(struct kmem_cache *s,
 	if (should_failslab(s, flags))
 		return NULL;
 
+#ifdef CONFIG_MEMCG_KMEM
 	if (memcg_kmem_enabled() &&
 	    ((flags & __GFP_ACCOUNT) || (s->flags & SLAB_ACCOUNT)))
 		return memcg_kmem_get_cache(s);
+#endif
 
 	return s;
 }
@@ -587,8 +589,10 @@ static inline void slab_post_alloc_hook(struct kmem_cache *s, gfp_t flags,
 					 s->flags, flags);
 	}
 
+#ifdef CONFIG_MEMCG_KMEM
 	if (memcg_kmem_enabled())
 		memcg_kmem_put_cache(s);
+#endif
 }
 
 #ifndef CONFIG_SLOB

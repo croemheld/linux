@@ -249,12 +249,14 @@ int swap_writepage(struct page *page, struct writeback_control *wbc)
 		unlock_page(page);
 		goto out;
 	}
+#ifdef CONFIG_FRONTSWAP
 	if (frontswap_store(page) == 0) {
 		set_page_writeback(page);
 		unlock_page(page);
 		end_page_writeback(page);
 		goto out;
 	}
+#endif
 	ret = __swap_writepage(page, wbc, end_swap_bio_write);
 out:
 	return ret;
@@ -358,11 +360,13 @@ int swap_readpage(struct page *page, bool synchronous)
 	VM_BUG_ON_PAGE(!PageSwapCache(page) && !synchronous, page);
 	VM_BUG_ON_PAGE(!PageLocked(page), page);
 	VM_BUG_ON_PAGE(PageUptodate(page), page);
+#ifdef CONFIG_FRONTSWAP
 	if (frontswap_load(page) == 0) {
 		SetPageUptodate(page);
 		unlock_page(page);
 		goto out;
 	}
+#endif
 
 	if (sis->flags & SWP_FS) {
 		struct file *swap_file = sis->swap_file;

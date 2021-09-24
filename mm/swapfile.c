@@ -722,7 +722,9 @@ static void swap_range_free(struct swap_info_struct *si, unsigned long offset,
 	else
 		swap_slot_free_notify = NULL;
 	while (offset <= end) {
+#ifdef CONFIG_FRONTSWAP
 		frontswap_invalidate_page(si->type, offset);
+#endif
 		if (swap_slot_free_notify)
 			swap_slot_free_notify(si->bdev, offset);
 		offset++;
@@ -2645,7 +2647,9 @@ SYSCALL_DEFINE1(swapoff, const char __user *, specialfile)
 	frontswap_map = frontswap_map_get(p);
 	spin_unlock(&p->lock);
 	spin_unlock(&swap_lock);
+#ifdef CONFIG_FRONTSWAP
 	frontswap_invalidate_area(p->type);
+#endif
 	frontswap_map_set(p, NULL);
 	mutex_unlock(&swapon_mutex);
 	free_percpu(p->percpu_cluster);

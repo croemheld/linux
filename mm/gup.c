@@ -361,6 +361,9 @@ retry:
 		if (page)
 			return page;
 	}
+#ifndef CONFIG_TRANSPARENT_HUGEPAGE
+	return follow_page_pte(vma, address, pmd, flags, &ctx->pgmap);
+#else
 	if (likely(!pmd_trans_huge(pmdval)))
 		return follow_page_pte(vma, address, pmd, flags, &ctx->pgmap);
 
@@ -418,6 +421,7 @@ retry_locked:
 	spin_unlock(ptl);
 	ctx->page_mask = HPAGE_PMD_NR - 1;
 	return page;
+#endif
 }
 
 static struct page *follow_pud_mask(struct vm_area_struct *vma,
