@@ -1119,8 +1119,10 @@ static void ieee80211_teardown_sdata(struct ieee80211_sub_if_data *sdata)
 		__skb_queue_purge(&sdata->fragments[i].skb_list);
 	sdata->fragment_next = 0;
 
+#ifdef CONFIG_MAC80211_MESH
 	if (ieee80211_vif_is_mesh(&sdata->vif))
 		ieee80211_mesh_teardown_sdata(sdata);
+#endif
 }
 
 static void ieee80211_uninit(struct net_device *dev)
@@ -1342,7 +1344,9 @@ static void ieee80211_iface_work(struct work_struct *work)
 		case NL80211_IFTYPE_MESH_POINT:
 			if (!ieee80211_vif_is_mesh(&sdata->vif))
 				break;
+#ifdef CONFIG_MAC80211_MESH
 			ieee80211_mesh_rx_queued_mgmt(sdata, skb);
+#endif
 			break;
 		default:
 			WARN(1, "frame for unexpected interface type");
@@ -1363,7 +1367,9 @@ static void ieee80211_iface_work(struct work_struct *work)
 	case NL80211_IFTYPE_MESH_POINT:
 		if (!ieee80211_vif_is_mesh(&sdata->vif))
 			break;
+#ifdef CONFIG_MAC80211_MESH
 		ieee80211_mesh_work(sdata);
+#endif
 		break;
 	case NL80211_IFTYPE_OCB:
 		ieee80211_ocb_work(sdata);
@@ -1450,8 +1456,10 @@ static void ieee80211_setup_sdata(struct ieee80211_sub_if_data *sdata,
 		ieee80211_ibss_setup_sdata(sdata);
 		break;
 	case NL80211_IFTYPE_MESH_POINT:
+#ifdef CONFIG_MAC80211_MESH
 		if (ieee80211_vif_is_mesh(&sdata->vif))
 			ieee80211_mesh_init_sdata(sdata);
+#endif
 		break;
 	case NL80211_IFTYPE_MONITOR:
 		sdata->dev->type = ARPHRD_IEEE80211_RADIOTAP;

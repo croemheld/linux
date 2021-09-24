@@ -126,8 +126,10 @@ static void __cleanup_single_sta(struct sta_info *sta)
 		ieee80211_purge_tx_queue(&local->hw, &sta->tx_filtered[ac]);
 	}
 
+#ifdef CONFIG_MAC80211_MESH
 	if (ieee80211_vif_is_mesh(&sdata->vif))
 		mesh_sta_cleanup(sta);
+#endif
 
 	cancel_work_sync(&sta->drv_deliver_wk);
 
@@ -659,8 +661,10 @@ static int sta_info_insert_finish(struct sta_info *sta) __acquires(RCU)
 	rcu_read_lock();
 	mutex_unlock(&local->sta_mtx);
 
+#ifdef CONFIG_MAC80211_MESH
 	if (ieee80211_vif_is_mesh(&sdata->vif))
 		mesh_accept_plinks_update(sdata);
+#endif
 
 	return 0;
  out_remove:
@@ -2427,11 +2431,13 @@ void sta_set_sinfo(struct sta_info *sta, struct station_info *sinfo,
 			BIT_ULL(NL80211_STA_INFO_ACK_SIGNAL_AVG);
 	}
 
+#ifdef CONFIG_MAC80211_MESH
 	if (ieee80211_vif_is_mesh(&sdata->vif)) {
 		sinfo->filled |= BIT_ULL(NL80211_STA_INFO_AIRTIME_LINK_METRIC);
 		sinfo->airtime_link_metric =
 			airtime_link_metric_get(local, sta);
 	}
+#endif
 }
 
 u32 sta_get_expected_throughput(struct sta_info *sta)

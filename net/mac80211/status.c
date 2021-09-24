@@ -893,10 +893,12 @@ static void __ieee80211_tx_status(struct ieee80211_hw *hw,
 		acked = !!(info->flags & IEEE80211_TX_STAT_ACK);
 
 		/* mesh Peer Service Period support */
+#ifdef CONFIG_MAC80211_MESH
 		if (ieee80211_vif_is_mesh(&sta->sdata->vif) &&
 		    ieee80211_is_data_qos(fc))
 			ieee80211_mpsp_trigger_process(
 				ieee80211_get_qos_ctl(hdr), sta, true, acked);
+#endif
 
 		if (!acked && test_sta_flag(sta, WLAN_STA_PS_STA)) {
 			/*
@@ -969,8 +971,10 @@ static void __ieee80211_tx_status(struct ieee80211_hw *hw,
 		}
 
 		rate_control_tx_status(local, sband, status);
+#ifdef CONFIG_MAC80211_MESH
 		if (ieee80211_vif_is_mesh(&sta->sdata->vif))
 			ieee80211s_update_metric(local, sta, status);
+#endif
 
 		if (!(info->flags & IEEE80211_TX_CTL_INJECTED) && acked)
 			ieee80211_frame_acked(sta, skb);
@@ -1140,8 +1144,10 @@ void ieee80211_tx_status_ext(struct ieee80211_hw *hw,
 		}
 
 		rate_control_tx_status(local, sband, status);
+#ifdef CONFIG_MAC80211_MESH
 		if (ieee80211_vif_is_mesh(&sta->sdata->vif))
 			ieee80211s_update_metric(local, sta, status);
+#endif
 	}
 
 	if (acked || noack_success) {

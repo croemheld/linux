@@ -2002,6 +2002,7 @@ void ieee80211_xmit(struct ieee80211_sub_if_data *sdata,
 	hdr = (struct ieee80211_hdr *) skb->data;
 	info->control.vif = &sdata->vif;
 
+#ifdef CONFIG_MAC80211_MESH
 	if (ieee80211_vif_is_mesh(&sdata->vif)) {
 		if (ieee80211_is_data(hdr->frame_control) &&
 		    is_unicast_ether_addr(hdr->addr1)) {
@@ -2011,6 +2012,7 @@ void ieee80211_xmit(struct ieee80211_sub_if_data *sdata,
 			ieee80211_mps_set_frame_flags(sdata, NULL, hdr);
 		}
 	}
+#endif
 
 	ieee80211_set_qos_hdr(sdata, skb);
 	ieee80211_tx(sdata, sta, skb, false, txdata_flags);

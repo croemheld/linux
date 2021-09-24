@@ -1831,8 +1831,10 @@ ieee80211_rx_h_sta_process(struct ieee80211_rx_data *rx)
 	}
 
 	/* mesh power save support */
+#ifdef CONFIG_MAC80211_MESH
 	if (ieee80211_vif_is_mesh(&rx->sdata->vif))
 		ieee80211_mps_rx_h_sta_process(sta, hdr);
+#endif
 
 	/*
 	 * Drop (qos-)data::nullfunc frames silently, since they
@@ -3324,9 +3326,11 @@ ieee80211_rx_h_action(struct ieee80211_rx_data *rx)
 
 		if (!ieee80211_vif_is_mesh(&sdata->vif))
 			break;
+#ifdef CONFIG_MAC80211_MESH
 		if (mesh_action_is_path_sel(mgmt) &&
 		    !mesh_path_sel_is_hwmp(sdata))
 			break;
+#endif
 		goto queue;
 	}
 
