@@ -1737,9 +1737,11 @@ struct bpf_prog *bpf_prog_select_runtime(struct bpf_prog *fp, int *err)
 			bpf_prog_free_unused_jited_linfo(fp);
 		}
 	} else {
+#ifdef CONFIG_BPF_SYSCALL
 		*err = bpf_prog_offload_compile(fp);
 		if (*err)
 			return fp;
+#endif
 	}
 
 finalize:
@@ -1970,8 +1972,11 @@ static void bpf_prog_free_deferred(struct work_struct *work)
 	int i;
 
 	aux = container_of(work, struct bpf_prog_aux, work);
-	if (bpf_prog_is_dev_bound(aux))
+	if (bpf_prog_is_dev_bound(aux)) {
+#ifdef CONFIG_BPF_SYSCALL
 		bpf_prog_offload_destroy(aux->prog);
+#endif
+	}
 #ifdef CONFIG_PERF_EVENTS
 	if (aux->prog->has_callchain_buf)
 		put_callchain_buffers();
