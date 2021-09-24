@@ -857,6 +857,7 @@ static inline int copy_pmd_range(struct mm_struct *dst_mm, struct mm_struct *src
 	src_pmd = pmd_offset(src_pud, addr);
 	do {
 		next = pmd_addr_end(addr, end);
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
 		if (is_swap_pmd(*src_pmd) || pmd_trans_huge(*src_pmd)
 			|| pmd_devmap(*src_pmd)) {
 			int err;
@@ -869,6 +870,7 @@ static inline int copy_pmd_range(struct mm_struct *dst_mm, struct mm_struct *src
 				continue;
 			/* fall through */
 		}
+#endif
 		if (pmd_none_or_clear_bad(src_pmd))
 			continue;
 		if (copy_pte_range(dst_mm, src_mm, dst_pmd, src_pmd,
@@ -891,6 +893,7 @@ static inline int copy_pud_range(struct mm_struct *dst_mm, struct mm_struct *src
 	src_pud = pud_offset(src_p4d, addr);
 	do {
 		next = pud_addr_end(addr, end);
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
 		if (pud_trans_huge(*src_pud) || pud_devmap(*src_pud)) {
 			int err;
 
@@ -903,6 +906,7 @@ static inline int copy_pud_range(struct mm_struct *dst_mm, struct mm_struct *src
 				continue;
 			/* fall through */
 		}
+#endif
 		if (pud_none_or_clear_bad(src_pud))
 			continue;
 		if (copy_pmd_range(dst_mm, src_mm, dst_pud, src_pud,
@@ -1147,6 +1151,7 @@ static inline unsigned long zap_pmd_range(struct mmu_gather *tlb,
 	pmd = pmd_offset(pud, addr);
 	do {
 		next = pmd_addr_end(addr, end);
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
 		if (is_swap_pmd(*pmd) || pmd_trans_huge(*pmd) || pmd_devmap(*pmd)) {
 			if (next - addr != HPAGE_PMD_SIZE)
 				__split_huge_pmd(vma, pmd, addr, false, NULL);
@@ -1154,6 +1159,7 @@ static inline unsigned long zap_pmd_range(struct mmu_gather *tlb,
 				goto next;
 			/* fall through */
 		}
+#endif
 		/*
 		 * Here there can be other concurrent MADV_DONTNEED or
 		 * trans huge page faults running, and if the pmd is
@@ -1182,6 +1188,7 @@ static inline unsigned long zap_pud_range(struct mmu_gather *tlb,
 	pud = pud_offset(p4d, addr);
 	do {
 		next = pud_addr_end(addr, end);
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
 		if (pud_trans_huge(*pud) || pud_devmap(*pud)) {
 			if (next - addr != HPAGE_PUD_SIZE) {
 				VM_BUG_ON_VMA(!rwsem_is_locked(&tlb->mm->mmap_sem), vma);
@@ -1190,6 +1197,7 @@ static inline unsigned long zap_pud_range(struct mmu_gather *tlb,
 				goto next;
 			/* fall through */
 		}
+#endif
 		if (pud_none_or_clear_bad(pud))
 			continue;
 		next = zap_pmd_range(tlb, vma, pud, addr, next, details);
@@ -3922,6 +3930,7 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
 		pud_t orig_pud = *vmf.pud;
 
 		barrier();
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
 		if (pud_trans_huge(orig_pud) || pud_devmap(orig_pud)) {
 
 			/* NUMA case for anonymous PUDs would go here */
@@ -3935,6 +3944,7 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
 				return 0;
 			}
 		}
+#endif
 	}
 
 	vmf.pmd = pmd_alloc(mm, vmf.pud, address);
@@ -3955,6 +3965,7 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
 				pmd_migration_entry_wait(mm, vmf.pmd);
 			return 0;
 		}
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
 		if (pmd_trans_huge(orig_pmd) || pmd_devmap(orig_pmd)) {
 			if (pmd_protnone(orig_pmd) && vma_is_accessible(vma))
 				return do_huge_pmd_numa_page(&vmf, orig_pmd);
@@ -3968,6 +3979,7 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
 				return 0;
 			}
 		}
+#endif
 	}
 
 	return handle_pte_fault(&vmf);
