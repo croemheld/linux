@@ -204,19 +204,33 @@ void dma_direct_free_pages(struct device *dev, size_t size, void *cpu_addr,
 void *dma_direct_alloc(struct device *dev, size_t size,
 		dma_addr_t *dma_handle, gfp_t gfp, unsigned long attrs)
 {
+#if !defined(CONFIG_ARCH_HAS_UNCACHED_SEGMENT) \
+ && (defined(CONFIG_ARCH_HAS_DMA_COHERENCE_H) \
+ ||  defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_DEVICE) \
+ ||  defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU) \
+ ||  defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU_ALL)) \
+ && !defined(CONFIG_DMA_NONCOHERENT_CACHE_SYNC)
 	if (!IS_ENABLED(CONFIG_ARCH_HAS_UNCACHED_SEGMENT) &&
 	    dma_alloc_need_uncached(dev, attrs))
 		return arch_dma_alloc(dev, size, dma_handle, gfp, attrs);
+#endif
 	return dma_direct_alloc_pages(dev, size, dma_handle, gfp, attrs);
 }
 
 void dma_direct_free(struct device *dev, size_t size,
 		void *cpu_addr, dma_addr_t dma_addr, unsigned long attrs)
 {
+#if !defined(CONFIG_ARCH_HAS_UNCACHED_SEGMENT) \
+ && (defined(CONFIG_ARCH_HAS_DMA_COHERENCE_H) \
+ ||  defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_DEVICE) \
+ ||  defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU) \
+ ||  defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU_ALL)) \
+ && !defined(CONFIG_DMA_NONCOHERENT_CACHE_SYNC)
 	if (!IS_ENABLED(CONFIG_ARCH_HAS_UNCACHED_SEGMENT) &&
 	    dma_alloc_need_uncached(dev, attrs))
 		arch_dma_free(dev, size, cpu_addr, dma_addr, attrs);
 	else
+#endif
 		dma_direct_free_pages(dev, size, cpu_addr, dma_addr, attrs);
 }
 
