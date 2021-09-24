@@ -91,10 +91,12 @@ static void truncate_exceptional_pvec_entries(struct address_space *mapping,
 		if (index >= end)
 			continue;
 
+#ifdef CONFIG_FS_DAX
 		if (unlikely(dax)) {
 			dax_delete_mapping_entry(mapping, index);
 			continue;
 		}
+#endif
 
 		__clear_shadow_entry(mapping, index, page);
 	}
@@ -128,8 +130,10 @@ static int invalidate_exceptional_entry2(struct address_space *mapping,
 	/* Handled by shmem itself */
 	if (shmem_mapping(mapping))
 		return 1;
+#ifdef CONFIG_FS_DAX
 	if (dax_mapping(mapping))
 		return dax_invalidate_mapping_entry_sync(mapping, index);
+#endif
 	clear_shadow_entry(mapping, index, entry);
 	return 1;
 }
