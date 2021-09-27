@@ -87,10 +87,12 @@ static void crypto_aegis128_update(struct aegis_state *state)
 static void crypto_aegis128_update_a(struct aegis_state *state,
 				     const union aegis_block *msg)
 {
+#ifdef CONFIG_CRYPTO_AEGIS128_SIMD
 	if (aegis128_do_simd()) {
 		crypto_aegis128_update_simd(state, msg);
 		return;
 	}
+#endif
 
 	crypto_aegis128_update(state);
 	crypto_aegis_block_xor(&state->blocks[0], msg);
@@ -98,10 +100,12 @@ static void crypto_aegis128_update_a(struct aegis_state *state,
 
 static void crypto_aegis128_update_u(struct aegis_state *state, const void *msg)
 {
+#ifdef CONFIG_CRYPTO_AEGIS128_SIMD
 	if (aegis128_do_simd()) {
 		crypto_aegis128_update_simd(state, msg);
 		return;
 	}
+#endif
 
 	crypto_aegis128_update(state);
 	crypto_xor(state->blocks[0].bytes, msg, AEGIS_BLOCK_SIZE);
@@ -417,10 +421,12 @@ static int crypto_aegis128_encrypt(struct aead_request *req)
 	unsigned int authsize = crypto_aead_authsize(tfm);
 	unsigned int cryptlen = req->cryptlen;
 
+#ifdef CONFIG_CRYPTO_AEGIS128_SIMD
 	if (aegis128_do_simd())
 		ops = &(struct aegis128_ops){
 			.skcipher_walk_init = skcipher_walk_aead_encrypt,
 			.crypt_chunk = crypto_aegis128_encrypt_chunk_simd };
+#endif
 
 	crypto_aegis128_crypt(req, &tag, cryptlen, ops);
 
@@ -445,10 +451,12 @@ static int crypto_aegis128_decrypt(struct aead_request *req)
 	scatterwalk_map_and_copy(tag.bytes, req->src, req->assoclen + cryptlen,
 				 authsize, 0);
 
+#ifdef CONFIG_CRYPTO_AEGIS128_SIMD
 	if (aegis128_do_simd())
 		ops = &(struct aegis128_ops){
 			.skcipher_walk_init = skcipher_walk_aead_decrypt,
 			.crypt_chunk = crypto_aegis128_decrypt_chunk_simd };
+#endif
 
 	crypto_aegis128_crypt(req, &tag, cryptlen, ops);
 
