@@ -11,3 +11,7 @@ vhost_vsock-y := vsock.o
 obj-$(CONFIG_VHOST_RING) += vringh.o
 
 obj-$(CONFIG_VHOST)	+= vhost.o
+
+ifeq  ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_vhost.o += -O1
+endif

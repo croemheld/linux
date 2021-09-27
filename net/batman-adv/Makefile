@@ -20,6 +20,11 @@ batman-adv-y += hard-interface.o
 batman-adv-y += hash.o
 batman-adv-$(CONFIG_BATMAN_ADV_DEBUGFS) += icmp_socket.o
 batman-adv-$(CONFIG_BATMAN_ADV_DEBUG) += log.o
+
+ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
+CFLAGS_log.o += -O1
+endif
+
 batman-adv-y += main.o
 batman-adv-$(CONFIG_BATMAN_ADV_MCAST) += multicast.o
 batman-adv-y += netlink.o

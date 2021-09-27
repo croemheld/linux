@@ -70,6 +70,7 @@ ifeq ($(CONFIG_CLANG_STATIC_ANALYSIS),y)
 CFLAGS_process.o += -O1
 CFLAGS_ptrace.o += -O1
 CFLAGS_smpboot.o += -O1
+CFLAGS_paravirt.o += -O1
 endif
 
 obj-y				+= fpu/
